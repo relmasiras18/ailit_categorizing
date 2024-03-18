@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorizing Images</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="categories">
+        <!-- Category 1 -->
+        <div class="category">
+            <input type="text" placeholder="Name of Category 1" class="category-name">
+            <div class="images-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <p>Drag the images here</p>
+            </div>
+        </div>
+        <!-- Category 2 -->
+        <div class="category">
+            <input type="text" placeholder="Name of Category 2" class="category-name">
+            <div class="images-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+                <p>Drag the images here</p>
+            </div>
+        </div>
+    </div>
+    <!-- Uncategorized Area -->
+    <div class="category" id="uncategorized">
+        <h2>Uncategorized</h2>
+        <div class="images-container" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <!-- Images placed here by default -->
+            <img src="1a.png" draggable="true" ondragstart="drag(event)" id="image1">
+            <img src="1b.png" draggable="true" ondragstart="drag(event)" id="image2">
+            <img src="1c.png" draggable="true" ondragstart="drag(event)" id="image3">
+            <img src="1d.png" draggable="true" ondragstart="drag(event)" id="image4">
+            <img src="1e.png" draggable="true" ondragstart="drag(event)" id="image5">
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
