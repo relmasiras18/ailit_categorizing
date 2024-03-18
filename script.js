@@ -1,64 +1,69 @@
 document.addEventListener('DOMContentLoaded', () => {
     const categories = document.querySelectorAll('.images-container');
-    let source = null; // Keep track of the element being dragged
+    const uncategorized = document.getElementById('uncategorized').querySelector('.images-container');
+    const dragTexts = document.querySelectorAll('.images-container > p');
 
-    // Function to check if an element should be placed before another
-    function isbefore(a, b) {
-        if (a.parentNode === b.parentNode) {
-            for (var cur = a; cur; cur = cur.previousSibling) {
-                if (cur === b) { 
-                    return true;
-                }
-            }
-        }
-        return false;
+    // Helper function to handle the start of a drag or touch event
+    function handleDragStart(event, elementId) {
+        event.dataTransfer.setData("text/plain", elementId);
     }
 
     document.querySelectorAll('img').forEach(img => {
-        // Making images draggable
-        img.setAttribute('draggable', true);
-        img.addEventListener('dragstart', function(e) {
-            source = e.target;
-            e.dataTransfer.effectAllowed = 'move';
+        // Handle drag start for mouse interactions
+        img.addEventListener('dragstart', function(event) {
+            handleDragStart(event, event.target.id);
         });
 
-        // Suppress the context menu on long press for touch devices
-        img.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        }, {passive: false});
+        // Add touchstart listener for touch interactions
+        img.addEventListener('touchstart', function(event) {
+            handleDragStart(event, event.target.id);
+        }, {passive: true}); // Use passive event listeners if possible to improve performance
     });
 
-    // Handling dragover event to allow dropping
+    // Generic function to prevent default behavior and allow drop
+    function allowDrop(event) {
+        event.preventDefault();
+    }
+
     categories.forEach(category => {
-        category.addEventListener('dragover', function(e) {
-            e.preventDefault();
-        });
+        // Allow drop for mouse interactions
+        category.addEventListener('dragover', allowDrop);
 
-        // Handling drop event to perform the drop
-        category.addEventListener('drop', function(e) {
-            e.preventDefault();
-            if (!source) return;
-
-            // Perform the drop based on the relative positions of the source and target
-            if (isbefore(source, e.target)) {
-                e.target.parentNode.insertBefore(source, e.target);
-            }
-            else {
-                e.target.parentNode.insertBefore(source, e.target.nextSibling);
-            }
-        });
+        // Allow drop for touch interactions (might require additional logic for touch devices)
+        category.addEventListener('touchmove', allowDrop, {passive: false});
     });
 
-    // Optionally: Implement touchstart, touchmove, and touchend event listeners for touch-based dragging
+    // Generic function to handle drop for both drag and touch events
+    function handleDrop(event) {
+        event.preventDefault();
+        const data = event.dataTransfer.getData("text/plain");
+        const draggedElement = document.getElementById(data);
+
+        let dropTarget = event.target;
+        if (event.target.tagName === 'P') {
+            // If dropping on the text paragraph, append to its parent (images-container)
+            dropTarget = event.target.parentNode;
+            event.target.style.display = 'none'; // Hide the "Drag images here" text
+        }
+        dropTarget.appendChild(draggedElement);
+
+        updateDragTextVisibility();
+    }
+
+    categories.forEach(category => {
+        // Handle drop for mouse interactions
+        category.addEventListener('drop', handleDrop);
+
+        // Handle drop for touch interactions
+        category.addEventListener('touchend', handleDrop, {passive: false});
+    });
 
     // Update the visibility of drag texts based on the presence of images
     function updateDragTextVisibility() {
-        document.querySelectorAll('.images-container > p').forEach(text => {
+        dragTexts.forEach(text => {
             const container = text.parentNode;
             const hasImages = container.querySelectorAll('img').length > 0;
             text.style.display = hasImages ? 'none' : 'block';
         });
     }
-
-    // Call updateDragTextVisibility at appropriate times to ensure the instructions are shown/hidden correctly
 });
